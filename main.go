@@ -39,13 +39,18 @@ func main() {
 // It will ping the api status endpoint and wait for a 200 to be returned on it.
 func connectToKibana(endpoint string) func() error {
 	return func() error {
-		resp, err := http.Get(fmt.Sprintf("%v/api/status", endpoint))
+		client := &http.Client{
+			Timeout: time.Second * 1,
+		}
+
+		resp, err := client.Get(fmt.Sprintf("%v/api/status", endpoint))
 		if err != nil {
 			return errors.Wrap(err, "get on kibana status")
 		}
 		if resp.StatusCode != 200 {
 			return fmt.Errorf("service returning %v", resp.StatusCode)
 		}
+
 		return nil
 	}
 }
